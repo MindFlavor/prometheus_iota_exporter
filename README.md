@@ -9,7 +9,7 @@
 [![commitssince](https://img.shields.io/github/commits-since/mindflavor/prometheus_iota_exporter/0.1.0.svg)](https://img.shields.io/github/commits-since/mindflavor/prometheus_iota_exporter/0.1.0.svg)
 
 ## Intro
-A Rust Prometheus exporter for IOTA (Iri) server. This tool exports the information provided by the Iri server API in a format that [Prometheus](https://prometheus.io/) can understand. It's a Rust-only clone of this exporter: [https://github.com/crholliday/iota-prom-exporter](https://github.com/crholliday/iota-prom-exporter). While this tool does not currently support all the metrics supported by the aoforementioned exporter it does not require NodeJS so it's easier to deploy on servers. Being Rust, the memory footprint is small (as it should be for such a simple tool). This library also exports the *last snapshotted* milestone so you can visually check if the new automatic snapshotting functionality works: 
+A Rust Prometheus exporter for IOTA (Iri) server. This tool exports the information provided by the Iri server API in a format that [Prometheus](https://prometheus.io/) can understand. It's a Rust-only clone of this exporter: [https://github.com/crholliday/iota-prom-exporter](https://github.com/crholliday/iota-prom-exporter). While this tool does not currently support all the metrics supported by the aforementioned exporter it does not require NodeJS so it's easier to deploy on servers. Being Rust, the memory/CPU footprint is also small (as it should be for such a simple tool). This library also exports the *last snapshotted* milestone so you can visually check if the new automatic snapshotting functionality works: 
 
 ![](imgs/snap_grafa.png)
 
