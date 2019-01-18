@@ -15,7 +15,7 @@ A Rust Prometheus exporter for IOTA (Iri) server. This tool exports the informat
 
 ## Prerequisites 
 
-* You need [Rust](https://www.rust-lang.org/) to compile this code. Simply follow the instructions on Rust's website to install the toolchain. If you get wierd errors while compiling please try and update your Rust version (I have developed it on `rustc 1.33.0-nightly (ceb251214 2019-01-16)`). 
+* You need [Rust](https://www.rust-lang.org/) to compile this code. Simply follow the instructions on Rust's website to install the toolchain. If you get wierd errors while compiling please try and update your Rust version first (I have developed it on `rustc 1.33.0-nightly (ceb251214 2019-01-16)`). 
 
 ## Compilation
 
@@ -35,13 +35,13 @@ cargo install prometheus_iota_exporter
 
 ## Usage
 
-Start the binary with `-h` to get the complete syntax. There parameters are:
+Start the binary with `-h` to get the complete syntax. The parameters are:
 
 | Parameter | Mandatory | Valid values | Default | Description |
-| -- | -- | -- | -- |
+| -- | -- | -- | -- | -- | 
 | `-v` | no | <switch> | | Enable verbose mode.
 | `-p` | no | any valid port number | 9978 | Specify the serivce port. This is the port your Prometheus instance should point to.
-| `-a` | yes | Your IRI management URL | | This is your IRI management port. Right now the tool does not support authentication so localhost is a good choice.
+| `-a` | yes | Any valid URI | | This is your IRI management port. Right now the tool does not support authentication so localhost is a good choice.
 | `-n` | no | <switch> | | If specified, the tool does not query for neighbors information. The output will be less informative but this is useful if you do not need the info.
 
 Once started, the tool will listen on the specified port (or the default one, 9978, if not specified) and return a Prometheus valid response at the url `/metrics`. So to check if the tool is working properly simply browse the `http://localhost:9978` (or whichever port you choose).
