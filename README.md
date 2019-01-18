@@ -1,4 +1,4 @@
-# Prometheus DHCP Exporter
+# Prometheus IOTA (Iri) Exporter
 
 [![legal](https://img.shields.io/github/license/mindflavor/prometheus_iota_exporter.svg)](LICENSE)  [![alpha](https://img.shields.io/badge/stability-alpha-yellow.svg)](https://img.shields.io/badge/stability-alpha-yellow.svg)
 
