@@ -1,0 +1,28 @@
+[package]
+name          = "prometheus_iota_exporter"
+version       = "0.1.0"
+authors       = ["Francesco Cogno <francesco.cogno@outlook.com>"]
+description   = "Prometheus IOTA Exporter"
+edition       = "2018"
+
+readme        = "README.md"
+license       = "MIT"
+repository    = "https://github.com/MindFlavor/prometheus_iota_exporter"
+documentation = "https://github.com/MindFlavor/prometheus_iota_exporter"
+homepage      = "https://github.com/MindFlavor/prometheus_iota_exporter"
+
+keywords      = ["prometheus", "exporter", "iota", "iri"]
+categories    = ["api-bindings"]
+
+
+[dependencies]
+log="0.4.6"
+env_logger="0.6.0"
+futures="0.1.25"
+clap="2.32.0"
+serde_json = "1.0.34"
+serde="1.0.84"
+serde_derive="1.0.84"
+failure="0.1.5"
+hyper="*"
+http="*"
