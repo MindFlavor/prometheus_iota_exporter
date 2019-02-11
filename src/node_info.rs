@@ -54,6 +54,10 @@ iota_node_info_latest_milestone {}
 # TYPE iota_node_info_latest_subtangle_milestone gauge
 iota_node_info_latest_subtangle_milestone {}
 
+# HELP iota_node_milestone_start_index Milestone start index
+# TYPE iota_node_milestone_start_index gauge
+iota_node_milestone_start_index {}
+
 # HELP iota_node_info_latest_snapshotted_milestone Snapshotted milestone at the interval
 # TYPE iota_node_info_latest_snapshotted_milestone gauge
 iota_node_info_latest_snapshotted_milestone {}
@@ -79,6 +83,7 @@ iota_node_info_jre_total_memory {}
         self.neighbors,
         self.latest_milestone_index,
         self.latest_solid_subtangle_milestone_index,
+        self.milestone_start_index,
         self.last_snapshotted_milestone_index,
         self.packet_queue_size,
         self.jre_free_memory,
