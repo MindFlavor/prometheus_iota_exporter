@@ -11,13 +11,13 @@ pub struct NodeInfo {
     #[serde(rename = "jreTotalMemory")]
     jre_total_memory: u64,
     #[serde(rename = "latestMilestoneIndex")]
-    latest_milestone_index: u64,
+    latest_milestone_index: i64,
     #[serde(rename = "latestSolidSubtangleMilestoneIndex")]
-    latest_solid_subtangle_milestone_index: u64,
+    latest_solid_subtangle_milestone_index: i64,
     #[serde(rename = "milestoneStartIndex")]
-    milestone_start_index: u64,
+    milestone_start_index: i64,
     #[serde(rename = "lastSnapshottedMilestoneIndex")]
-    last_snapshotted_milestone_index: u64,
+    last_snapshotted_milestone_index: i64,
     #[serde(rename = "neighbors")]
     neighbors: u32,
     #[serde(rename = "packetsQueueSize")]
