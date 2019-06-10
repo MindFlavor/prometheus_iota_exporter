@@ -2,25 +2,26 @@
 extern crate serde_derive;
 #[macro_use]
 extern crate failure;
-use clap;
-use clap::Arg;
+use clap::{crate_authors, crate_name, crate_version, Arg};
 use futures::future::{done, ok, Future};
 use futures::stream::Stream;
 use http::StatusCode;
 use hyper::service::service_fn;
 use hyper::Client;
 use hyper::{Body, Request, Response, Server};
-use log::{debug, error, info, warn};
+use log::{debug, error, info, trace, warn};
 use std::env;
 mod exporter_error;
 use crate::exporter_error::ExporterError;
 mod node_info;
 use crate::node_info::NodeInfo;
+use std::sync::Arc;
 mod get_neighbors;
 use get_neighbors::Neighbors;
 mod options;
 use crate::options::Options;
 mod render_to_prometheus;
+use prometheus_exporter_base::render_prometheus;
 use render_to_prometheus::RenderToPrometheus;
 
 fn handle_request(
@@ -194,10 +195,32 @@ fn check_params_and_prepare_requests(
     }
 }
 
+fn perform_request_new(
+    req: Request<Body>,
+    options: &Arc<Options>,
+) -> impl Future<Item = Response<Body>, Error = failure::Error> {
+    trace!("perform_request");
+    let cli = Client::new();
+
+    let mut request = hyper::Request::builder();
+    request
+        .method("PUT")
+        .uri(options.iri_uri.clone())
+        .header("X-IOTA-API-Version", "1")
+        .header("Content-Type", "application/json");
+    done(request.body(Body::from("{\"command\": \"getNodeInfo\"}")))
+        .from_err()
+        .and_then(move |request_node_info| {
+            extract_body(cli.request(request_node_info))
+                .from_err()
+                .and_then(|request_node_info| ok(Response::new(Body::from(request_node_info))))
+        })
+}
+
 fn main() {
-    let matches = clap::App::new("prometheus_iota_exporter")
-        .version("0.1")
-        .author("Francesco Cogno <francesco.cogno@outlook.com>")
+    let matches = clap::App::new(crate_name!())
+        .version(crate_version!())
+        .author(crate_authors!("\n"))
         .arg(
             Arg::with_name("iri address")
                 .short("a")
@@ -208,7 +231,7 @@ fn main() {
         .arg(
             Arg::with_name("port")
                 .short("p")
-                .help("exporter port (default 9978)")
+                .help("exporter port")
                 .default_value("9978")
                 .takes_value(true),
         )
@@ -229,9 +252,15 @@ fn main() {
     let options = Options::from_claps(&matches).unwrap();
 
     if options.verbose {
-        env::set_var("RUST_LOG", "actix_web=trace,prometheus_iota_exporter=trace");
+        env::set_var(
+            "RUST_LOG",
+            format!("{}=trace,prometheus_exporter_base=trace", crate_name!()),
+        );
     } else {
-        env::set_var("RUST_LOG", "actix_web=info,prometheus_iota_exporter=info");
+        env::set_var(
+            "RUST_LOG",
+            format!("{}=info,prometheus_exporter_base=info", crate_name!()),
+        );
     }
     env_logger::init();
 
@@ -243,14 +272,18 @@ fn main() {
 
     info!("starting exporter on {}", addr);
 
-    let new_svc = move || {
-        let options = options.clone();
-        service_fn(move |req| handle_request(req, &options))
-    };
+    render_prometheus(&addr, options, |request, options| {
+        Box::new(perform_request_new(request, options))
+    });
 
-    let server = Server::bind(&addr)
-        .serve(new_svc)
-        .map_err(|e| eprintln!("server error: {}", e));
-    // Run this server for... forever!
-    hyper::rt::run(server);
+    //let new_svc = move || {
+    //    let options = options.clone();
+    //    service_fn(move |req| handle_request(req, &options))
+    //};
+
+    //let server = Server::bind(&addr)
+    //    .serve(new_svc)
+    //    .map_err(|e| eprintln!("server error: {}", e));
+    //// Run this server for... forever!
+    //hyper::rt::run(server);
 }
