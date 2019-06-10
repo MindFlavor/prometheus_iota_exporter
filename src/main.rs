@@ -200,21 +200,50 @@ fn perform_request_new(
     options: &Arc<Options>,
 ) -> impl Future<Item = Response<Body>, Error = failure::Error> {
     trace!("perform_request");
-    let cli = Client::new();
 
-    let mut request = hyper::Request::builder();
-    request
-        .method("PUT")
-        .uri(options.iri_uri.clone())
-        .header("X-IOTA-API-Version", "1")
-        .header("Content-Type", "application/json");
-    done(request.body(Body::from("{\"command\": \"getNodeInfo\"}")))
-        .from_err()
-        .and_then(move |request_node_info| {
-            extract_body(cli.request(request_node_info))
-                .from_err()
-                .and_then(|request_node_info| ok(Response::new(Body::from(request_node_info))))
+    let fut_get_node_info = create_iri_future("getNodeInfo", options)
+        .and_then(|node_info_str| done(serde_json::from_str(&node_info_str)).from_err())
+        .and_then(|node_info: NodeInfo| {
+            debug!("{:?}", node_info);
+            ok(node_info)
+        });
+
+    let fut_get_neighbors = create_iri_future("getNeighbors", options)
+        .and_then(|get_neigh_str| done(serde_json::from_str(&get_neigh_str)).from_err())
+        .and_then(|get_neighbors: Neighbors| {
+            debug!("{:?}", get_neighbors);
+            ok(get_neighbors)
+        });
+
+    fut_get_node_info
+        .join(fut_get_neighbors)
+        .and_then(|(node_info, get_neighbors)| {
+            let response = format!("{}\n{}", node_info.render(), get_neighbors.render());
+            ok(Response::new(Body::from(response)))
         })
+}
+
+fn create_iri_future(
+    command: &str,
+    options: &Arc<Options>,
+) -> impl Future<Item = String, Error = failure::Error> {
+    let cli = Client::new();
+    let mut request = hyper::Request::builder();
+
+    done(
+        request
+            .method("PUT")
+            .uri(options.iri_uri.clone())
+            .header("X-IOTA-API-Version", "1")
+            .header("Content-Type", "application/json")
+            .body(Body::from(format!("{{\"command\": \"{}\"}}", command))),
+    )
+    .from_err()
+    .and_then(move |request| extract_body(cli.request(request)).from_err())
+    .and_then(|text: String| {
+        debug!("{:?}", text);
+        ok(text)
+    })
 }
 
 fn main() {
