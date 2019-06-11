@@ -12,8 +12,7 @@ documentation            = "https://github.com/MindFlavor/prometheus_iota_export
 homepage                 = "https://github.com/MindFlavor/prometheus_iota_exporter"
 
 keywords                 = ["prometheus", "exporter", "iota", "iri"]
-categories               = ["api-bindings"]
-
+categories               = ["database"]
 
 [dependencies]
 log                      = "0.4.6"

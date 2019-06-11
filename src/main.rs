@@ -26,14 +26,14 @@ use render_to_prometheus::RenderToPrometheus;
 #[inline]
 fn extract_body(
     req: hyper::client::ResponseFuture,
-) -> Box<Future<Item = String, Error = ExporterError> + Send> {
-    Box::new(req.from_err().and_then(|resp| {
+) -> impl Future<Item = String, Error = ExporterError> + Send {
+    req.from_err().and_then(|resp| {
         debug!("response == {:?}", resp);
         let (_parts, body) = resp.into_parts();
         body.concat2()
             .from_err()
             .and_then(|complete_body| done(String::from_utf8(complete_body.to_vec())).from_err())
-    }))
+    })
 }
 
 fn perform_request(
@@ -45,12 +45,14 @@ fn perform_request(
     let fut_get_node_info = create_iri_future::<NodeInfo>("getNodeInfo", options);
 
     if options.exclude_neighbors {
+        // in this case we only query the getNodeInfo method
         Either::A(
             fut_get_node_info
                 .and_then(|node_info| ok(Response::new(Body::from(node_info.render())))),
         )
     } else {
         Either::B({
+            // we add the getNeighbors method
             let fut_get_neighbors = create_iri_future::<Neighbors>("getNeighbors", options);
 
             // we join the two futures so they will run concurrently
@@ -122,7 +124,7 @@ fn main() {
         .arg(
             Arg::with_name("exclude neighbors")
                 .short("n")
-                .help("do not ask exclude_neighbors")
+                .help("do not include getNeighbors method results")
                 .takes_value(false),
         )
         .get_matches();
@@ -153,15 +155,4 @@ fn main() {
     render_prometheus(&addr, options, |request, options| {
         Box::new(perform_request(request, options))
     });
-
-    //let new_svc = move || {
-    //    let options = options.clone();
-    //    service_fn(move |req| handle_request(req, &options))
-    //};
-
-    //let server = Server::bind(&addr)
-    //    .serve(new_svc)
-    //    .map_err(|e| eprintln!("server error: {}", e));
-    //// Run this server for... forever!
-    //hyper::rt::run(server);
 }
