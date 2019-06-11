@@ -1,7 +1,5 @@
 #[derive(Debug, Fail)]
 pub(crate) enum ExporterError {
-    //    #[fail(display = "Generic error: {}", s)]
-    //    GenericError { s: String },
     #[fail(display = "Hyper error: {}", e)]
     HyperError { e: hyper::error::Error },
 
