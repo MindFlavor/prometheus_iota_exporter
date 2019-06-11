@@ -4,13 +4,10 @@ extern crate serde_derive;
 extern crate failure;
 use clap::{crate_authors, crate_name, crate_version, Arg};
 use futures::future::{done, ok, Either, Future};
-use futures::stream::Stream;
-use hyper::Client;
 use hyper::{Body, Request, Response};
-use log::{debug, info, trace};
+use log::{info, trace};
 use std::env;
 mod exporter_error;
-use crate::exporter_error::ExporterError;
 mod node_info;
 use crate::node_info::NodeInfo;
 use std::sync::Arc;
@@ -20,21 +17,8 @@ mod options;
 use crate::options::Options;
 use serde::de::DeserializeOwned;
 mod render_to_prometheus;
-use prometheus_exporter_base::render_prometheus;
+use prometheus_exporter_base::{create_deserialize_future_from_hyper_request, render_prometheus};
 use render_to_prometheus::RenderToPrometheus;
-
-#[inline]
-fn extract_body(
-    req: hyper::client::ResponseFuture,
-) -> impl Future<Item = String, Error = ExporterError> + Send {
-    req.from_err().and_then(|resp| {
-        debug!("response == {:?}", resp);
-        let (_parts, body) = resp.into_parts();
-        body.concat2()
-            .from_err()
-            .and_then(|complete_body| done(String::from_utf8(complete_body.to_vec())).from_err())
-    })
-}
 
 fn perform_request(
     _req: Request<Body>,
@@ -73,7 +57,6 @@ fn create_iri_future<T>(
 where
     T: DeserializeOwned + std::fmt::Debug,
 {
-    let cli = Client::new();
     let mut request = hyper::Request::builder();
 
     done(
@@ -85,16 +68,7 @@ where
             .body(Body::from(format!("{{\"command\": \"{}\"}}", command))),
     )
     .from_err()
-    .and_then(move |request| extract_body(cli.request(request)).from_err())
-    .and_then(|text: String| {
-        debug!("received_text == {:?}", text);
-        ok(text)
-    })
-    .and_then(|text| done(serde_json::from_str(&text)).from_err())
-    .and_then(|t: T| {
-        debug!("received_object == {:?}", t);
-        ok(t)
-    })
+    .and_then(move |request| create_deserialize_future_from_hyper_request(request))
 }
 
 fn main() {
