@@ -4,9 +4,9 @@
 
 [![Crate](https://img.shields.io/crates/v/prometheus_iota_exporter.svg)](https://crates.io/crates/prometheus_iota_exporter) [![cratedown](https://img.shields.io/crates/d/prometheus_iota_exporter.svg)](https://crates.io/crates/prometheus_iota_exporter) [![cratelastdown](https://img.shields.io/crates/dv/prometheus_iota_exporter.svg)](https://crates.io/crates/prometheus_iota_exporter)
 
-[![tag](https://img.shields.io/github/tag/mindflavor/prometheus_iota_exporter.svg)](https://github.com/MindFlavor/prometheus_iota_exporter/tree/0.1.2)
-[![release](https://img.shields.io/github/release/MindFlavor/prometheus_iota_exporter.svg)](https://github.com/MindFlavor/prometheus_iota_exporter/tree/0.1.2)
-[![commitssince](https://img.shields.io/github/commits-since/mindflavor/prometheus_iota_exporter/0.1.2.svg)](https://img.shields.io/github/commits-since/mindflavor/prometheus_iota_exporter/0.1.2.svg)
+[![tag](https://img.shields.io/github/tag/mindflavor/prometheus_iota_exporter.svg)](https://github.com/MindFlavor/prometheus_iota_exporter/tree/0.1.3)
+[![release](https://img.shields.io/github/release/MindFlavor/prometheus_iota_exporter.svg)](https://github.com/MindFlavor/prometheus_iota_exporter/tree/0.1.3)
+[![commitssince](https://img.shields.io/github/commits-since/mindflavor/prometheus_iota_exporter/0.1.3.svg)](https://img.shields.io/github/commits-since/mindflavor/prometheus_iota_exporter/0.1.3.svg)
 
 ## Intro
 A Rust Prometheus exporter for IOTA (Iri) server. This tool exports the information provided by the Iri server API in a format that [Prometheus](https://prometheus.io/) can understand. It's a Rust-only clone of this exporter: [https://github.com/crholliday/iota-prom-exporter](https://github.com/crholliday/iota-prom-exporter). While this tool does not currently support all the metrics supported by the aforementioned exporter it does not require NodeJS so it's easier to deploy on servers. Being Rust, the memory/CPU footprint is also small (as it should be for such a simple tool). This library also exports the *last snapshotted* milestone so you can visually check if the new automatic snapshotting functionality works: 
