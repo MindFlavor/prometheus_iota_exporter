@@ -1,13 +1,5 @@
 #[derive(Debug, Fail)]
 pub(crate) enum ExporterError {
-    //    #[fail(display = "Generic error: {}", s)]
-    //    GenericError { s: String },
-    #[fail(display = "Unsupported path {}. Only /metrics is supported", path)]
-    UnsupportedPathError { path: String },
-
-    #[fail(display = "Unsupported verb {}. Only GET is supported", verb)]
-    UnsupportedMethodError { verb: String },
-
     #[fail(display = "Hyper error: {}", e)]
     HyperError { e: hyper::error::Error },
 
